@@ -2,55 +2,73 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>OSCE AI | Simulador Clínico</title>
     <meta name="description" content="Simulação médica avançada com modificadores de realismo.">
+    <meta name="theme-color" content="#0B0F19">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS (SEM CONFIGURAÇÃO EXTERNA - BLINDADO) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
     
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* CSS CRÍTICO - Isso garante que o site tenha cor mesmo se o JS falhar */
+        /* --- CSS CRÍTICO & FIXES iOS/SAFARI --- */
+
+        /* 1. Previne "flash" de elementos Alpine.js antes de carregar */
+        [x-cloak] { display: none !important; }
+
+        /* 2. Fix do Scroll Elástico (Rubber Banding) no iOS */
+        html {
+            background-color: #0B0F19; /* Garante que o fundo do navegador seja escuro */
+            -webkit-text-size-adjust: 100%; /* Previne zoom automático em fontes */
+            height: 100%;
+        }
+
         body {
             background-color: #0B0F19;
             color: #E2E8F0;
             font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
+            -webkit-font-smoothing: antialiased; /* Renderização de fonte nítida no Mac */
+            -moz-osx-font-smoothing: grayscale;
+            /* NÃO use overflow-x-hidden aqui no iOS. Usamos no wrapper abaixo. */
+            width: 100%;
+            height: 100%;
         }
 
-        /* Títulos com fonte especial */
+        /* 3. Tipografia */
         h1, h2, h3, .font-display {
             font-family: 'Space Grotesk', sans-serif;
         }
         
-        /* Vidro fosco forçado para iOS */
+        /* 4. Vidro Fosco (Glassmorphism) Otimizado para GPU */
         .glass-panel {
-            background: rgba(21, 27, 43, 0.75);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(21, 27, 43, 0.70);
+            -webkit-backdrop-filter: blur(16px) saturate(180%); /* Safari Prefix Obrigatório */
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            /* HACK IOS: Força aceleração de hardware para evitar glitches visuais */
+            transform: translateZ(0); 
+            will-change: backdrop-filter;
         }
 
-        /* Gradiente de Texto */
+        /* 5. Gradiente de Texto Blindado */
         .gradient-text {
             background: linear-gradient(135deg, #00D2FF 0%, #3A86FF 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
-            color: #00D2FF;
+            color: transparent; /* Fallback */
+            display: inline-block; /* Safari precisa disso para aplicar o gradiente corretamente */
         }
 
-        /* Grid de Fundo */
+        /* 6. Grid de Fundo */
         .hero-grid {
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -58,9 +76,10 @@
             background-size: 40px 40px;
             mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
             -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+            pointer-events: none; /* Garante que cliques passem pelo grid */
         }
 
-        /* Animações manuais para não depender do Tailwind Config */
+        /* Animações */
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-12px); }
@@ -78,278 +97,274 @@
         }
     </style>
 </head>
-<body class="antialiased overflow-x-hidden bg-[#0B0F19] text-slate-200 selection:bg-[#00D2FF] selection:text-[#0B0F19]">
+<body>
 
-    <!-- Navbar -->
-    <nav class="fixed w-full z-50 transition-all duration-300 py-4" :class="{ 'glass-panel': scrolled, 'bg-transparent': !scrolled }" x-data="{ scrolled: false, mobileOpen: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <!-- Logo -->
-            <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00D2FF] to-[#3A86FF] flex items-center justify-center">
-                    <i class="ph-bold ph-brain text-white text-lg"></i>
-                </div>
-                <span class="font-display font-bold text-xl tracking-tight text-white">OSCE <span class="text-[#00D2FF]">AI</span></span>
-            </div>
+    <div class="overflow-x-hidden w-full min-h-[100dvh] relative flex flex-col">
 
-            <!-- Desktop Links -->
-            <div class="hidden md:flex items-center gap-8">
-                <a href="#metodologia" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Metodologia</a>
-                <a href="#simulacao" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Preview</a>
-                <a href="#futuro" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Roadmap</a>
-            </div>
-
-            <!-- CTA Button Desktop -->
-            <div class="hidden md:block">
-                <a href="#offer" class="px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[#00D2FF]/50 text-white text-sm font-medium transition-all flex items-center gap-2 group">
-                    <span>Acesso Beta</span>
-                    <i class="ph-bold ph-arrow-right text-[#00D2FF] group-hover:translate-x-1 transition-transform"></i>
-                </a>
-            </div>
-
-            <!-- Mobile Toggle -->
-            <button class="md:hidden text-white p-2" @click="mobileOpen = !mobileOpen">
-                <i class="ph-bold ph-list text-2xl"></i>
-            </button>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div class="md:hidden glass-panel border-t border-white/5 absolute top-full left-0 w-full" x-show="mobileOpen" x-transition style="display: none;">
-            <div class="flex flex-col p-6 space-y-6">
-                <a href="#metodologia" @click="mobileOpen=false" class="text-gray-300 text-lg font-medium">Metodologia</a>
-                <a href="#simulacao" @click="mobileOpen=false" class="text-gray-300 text-lg font-medium">Preview</a>
-                <a href="#offer" @click="mobileOpen=false" class="text-[#00D2FF] font-bold text-lg border border-[#00D2FF]/30 bg-[#00D2FF]/10 p-3 rounded-lg text-center">Quero Acesso Agora</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center pt-28 pb-12 overflow-hidden">
-        <!-- Glows Manuais (Hardcoded para performance) -->
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-            <div class="absolute top-[20%] -left-[10%] w-[500px] h-[500px] bg-[#3A86FF] rounded-full blur-[120px] opacity-20"></div>
-            <div class="absolute bottom-[20%] -right-[10%] w-[500px] h-[500px] bg-[#00D2FF] rounded-full blur-[120px] opacity-10"></div>
-            <div class="absolute inset-0 hero-grid z-0 opacity-30"></div>
-        </div>
-
-        <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-            
-            <!-- Texto -->
-            <div class="space-y-8 text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D2FF]/10 border border-[#00D2FF]/20">
-                    <span class="w-2 h-2 rounded-full bg-[#00D2FF] animate-pulse"></span>
-                    <span class="text-xs font-semibold tracking-wide text-[#00D2FF] uppercase">Engine v1.0 Disponível</span>
+        <nav class="fixed w-full z-50 transition-all duration-300 py-4" 
+             :class="{ 'glass-panel': scrolled, 'bg-transparent': !scrolled }" 
+             x-data="{ scrolled: false, mobileOpen: false }" 
+             @scroll.window="scrolled = (window.pageYOffset > 20)">
+             
+            <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00D2FF] to-[#3A86FF] flex items-center justify-center shadow-[0_0_15px_rgba(0,210,255,0.3)]">
+                        <i class="ph-bold ph-brain text-white text-lg"></i>
+                    </div>
+                    <span class="font-display font-bold text-xl tracking-tight text-white">OSCE <span class="text-[#00D2FF]">AI</span></span>
                 </div>
 
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight tracking-tight text-white">
-                    O Preceptor que <br>
-                    <span class="gradient-text">nunca dorme.</span>
-                </h1>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#metodologia" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Metodologia</a>
+                    <a href="#simulacao" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Preview</a>
+                    <a href="#futuro" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Roadmap</a>
+                </div>
 
-                <p class="text-lg text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                    Um simulador de casos clínicos baseado nas <strong>melhores evidências científicas</strong>. Treine com pacientes que mentem, evoluem e reagem à sua conduta, direto no seu Gemini.
-                </p>
-
-                <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-                    <a href="#offer" class="w-full sm:w-auto px-8 py-4 bg-[#00D2FF] text-[#0B0F19] font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_30px_rgba(0,210,255,0.3)] flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-lightning"></i>
-                        Acesso Founder (R$ 97)
-                    </a>
-                    <a href="#metodologia" class="w-full sm:w-auto px-8 py-4 glass-panel text-white font-medium rounded-xl hover:bg-white/5 transition-all flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-book-open-text"></i>
-                        Ver Metodologia
+                <div class="hidden md:block">
+                    <a href="#offer" class="px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[#00D2FF]/50 text-white text-sm font-medium transition-all flex items-center gap-2 group">
+                        <span>Acesso Beta</span>
+                        <i class="ph-bold ph-arrow-right text-[#00D2FF] group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
+
+                <button class="md:hidden text-white p-2 active:scale-95 transition-transform" @click="mobileOpen = !mobileOpen" aria-label="Menu">
+                    <i class="ph-bold" :class="mobileOpen ? 'ph-x' : 'ph-list'" style="font-size: 1.5rem;"></i>
+                </button>
+            </div>
+
+            <div class="md:hidden glass-panel border-t border-white/5 absolute top-full left-0 w-full shadow-2xl" 
+                 x-show="mobileOpen" 
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2">
+                <div class="flex flex-col p-6 space-y-6">
+                    <a href="#metodologia" @click="mobileOpen=false" class="text-gray-300 text-lg font-medium active:text-white">Metodologia</a>
+                    <a href="#simulacao" @click="mobileOpen=false" class="text-gray-300 text-lg font-medium active:text-white">Preview</a>
+                    <a href="#futuro" @click="mobileOpen=false" class="text-gray-300 text-lg font-medium active:text-white">Roadmap</a>
+                    <a href="#offer" @click="mobileOpen=false" class="text-[#00D2FF] font-bold text-lg border border-[#00D2FF]/30 bg-[#00D2FF]/10 p-4 rounded-xl text-center shadow-[0_0_20px_rgba(0,210,255,0.1)]">
+                        Quero Acesso Agora
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="relative min-h-[100dvh] flex items-center justify-center pt-28 pb-12 overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div class="absolute top-[20%] -left-[10%] w-[500px] h-[500px] bg-[#3A86FF] rounded-full blur-[120px] opacity-20"></div>
+                <div class="absolute bottom-[20%] -right-[10%] w-[500px] h-[500px] bg-[#00D2FF] rounded-full blur-[120px] opacity-10"></div>
+                <div class="absolute inset-0 hero-grid opacity-30"></div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center w-full">
                 
-                <div class="flex items-center justify-center lg:justify-start gap-6 pt-4 text-gray-500 text-sm font-medium">
-                    <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-[#00E096]"></i> Casos Infinitos</span>
-                    <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-[#00E096]"></i> Feedback Real</span>
-                </div>
-            </div>
-
-            <!-- Demo Visual -->
-            <div id="simulacao" class="relative animate-float lg:block hidden">
-                <div class="glass-panel rounded-2xl border border-white/10 p-1 shadow-2xl max-w-md mx-auto">
-                    <div class="bg-[#0B0F19]/80 px-4 py-3 rounded-t-xl flex items-center gap-2 border-b border-white/5">
-                        <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-                        <div class="ml-4 text-xs text-gray-500 font-mono">Gemini Advanced • OSCE AI</div>
+                <div class="space-y-8 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D2FF]/10 border border-[#00D2FF]/20">
+                        <span class="w-2 h-2 rounded-full bg-[#00D2FF] animate-pulse"></span>
+                        <span class="text-xs font-semibold tracking-wide text-[#00D2FF] uppercase">Engine v1.0 Disponível</span>
                     </div>
 
-                    <div class="p-6 space-y-5 font-sans text-sm bg-[#0B0F19] h-[500px] overflow-hidden relative">
-                        <!-- AI Msg -->
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-[#3A86FF] flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
-                            <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200 w-full">
-                                <p class="font-bold text-[#00D2FF] mb-1">INÍCIO DO CASO</p>
-                                <ul class="space-y-1 text-xs text-gray-300">
-                                    <li><strong>Local:</strong> UPA 24h</li>
-                                    <li><strong>ID:</strong> Homem, 58 anos.</li>
-                                    <li><strong>Triagem:</strong> <span class="text-[#FFCF52]">Amarela</span> (PA 160x100)</li>
-                                    <li><strong>QP:</strong> "Doutor, tá queimando tudo aqui..."</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight tracking-tight text-white">
+                        O Preceptor que <br>
+                        <span class="gradient-text">nunca dorme.</span>
+                    </h1>
 
-                        <!-- User Msg -->
-                        <div class="flex gap-3 justify-end">
-                            <div class="bg-[#00D2FF]/20 border border-[#00D2FF]/30 p-3 rounded-l-lg rounded-br-lg text-white max-w-[85%]">
-                                Vou levar para sala de emergência e monitorizar. Caracterize a dor.
-                            </div>
-                            <div class="w-8 h-8 rounded bg-gray-600 flex-shrink-0 flex items-center justify-center text-xs">EU</div>
-                        </div>
+                    <p class="text-lg text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                        Um simulador de casos clínicos baseado nas <strong>melhores evidências científicas</strong>. Treine com pacientes que mentem, evoluem e reagem à sua conduta, direto no seu Gemini.
+                    </p>
 
-                        <!-- AI Msg 2 -->
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-[#3A86FF] flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
-                            <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200 w-full">
-                                <p class="italic text-gray-400 mb-2">"A dor é um peso, nota 9/10... Irradia pro braço esquerdo."</p>
-                                <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/10">
-                                    <span class="text-[10px] bg-[#FF4D4D]/20 text-[#FF4D4D] px-1 rounded border border-[#FF4D4D]/30">CRÍTICO</span>
-                                    <span class="text-[10px] text-gray-400">Modificador: Paciente ansioso</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#0B0F19] to-transparent"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Metodologia -->
-    <section id="metodologia" class="py-20 bg-[#151B2B] border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-display font-bold text-white mb-4">Não é um Chatbot. É uma Engine.</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">O prompt foi estruturado com base em protocolos educacionais reais.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- Card 1 -->
-                <div class="glass-panel p-6 rounded-2xl hover:border-[#00D2FF]/30 transition-all">
-                    <i class="ph-duotone ph-sliders-horizontal text-4xl text-[#00D2FF] mb-4"></i>
-                    <h3 class="text-lg font-bold text-white mb-2">Modificadores de Realismo</h3>
-                    <p class="text-gray-400 text-sm">Variáveis caóticas: pacientes com baixo letramento, familiares agressivos ou evolução temporal.</p>
-                </div>
-                <!-- Card 2 -->
-                <div class="glass-panel p-6 rounded-2xl hover:border-[#3A86FF]/30 transition-all">
-                    <i class="ph-duotone ph-books text-4xl text-[#3A86FF] mb-4"></i>
-                    <h3 class="text-lg font-bold text-white mb-2">Pérola do Preceptor</h3>
-                    <p class="text-gray-400 text-sm">Lições práticas baseadas em evidência explicando o <em>porquê</em> de cada conduta.</p>
-                </div>
-                <!-- Card 3 -->
-                <div class="glass-panel p-6 rounded-2xl hover:border-[#00E096]/30 transition-all">
-                    <i class="ph-duotone ph-chart-line-up text-4xl text-[#00E096] mb-4"></i>
-                    <h3 class="text-lg font-bold text-white mb-2">Feedback por Domínios</h3>
-                    <p class="text-gray-400 text-sm">Nota de Anamnese separada da nota de Conduta. Saiba onde melhorar.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Roadmap / Futuro -->
-    <section id="futuro" class="py-24 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="glass-panel rounded-3xl p-8 md:p-16 border border-[#00D2FF]/20 relative">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00D2FF] to-transparent"></div>
-
-                <div class="flex flex-col lg:flex-row gap-12 items-center">
-                    <div class="lg:w-1/2 space-y-6">
-                        <div class="inline-block px-3 py-1 rounded bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider">
-                            Financie o Futuro
-                        </div>
-                        <h2 class="text-3xl md:text-5xl font-display font-bold text-white">
-                            A plataforma completa <br>está chegando.
-                        </h2>
-                        <p class="text-gray-300 text-lg">
-                            Estamos migrando do Gemini para uma <strong>plataforma web própria e dedicada</strong>, com histórico de desempenho e cenários complexos de UTI.
-                        </p>
-                        <p class="text-gray-400">
-                            Ao comprar o acesso ao <strong>Agente Textual</strong> hoje, você financia esse desenvolvimento e garante seu lugar como <strong>Membro Founder</strong>.
-                        </p>
-                    </div>
-
-                    <div class="lg:w-1/2 w-full">
-                         <div class="relative rounded-xl overflow-hidden border border-white/10 aspect-video bg-black group cursor-not-allowed">
-                             <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"></div>
-                             <div class="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm">
-                                <i class="ph-duotone ph-lock-key text-5xl text-gray-400 mb-4"></i>
-                                <span class="text-gray-300 font-mono text-sm tracking-widest uppercase">Em Desenvolvimento</span>
-                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Oferta -->
-    <section id="offer" class="py-24 relative">
-        <div class="max-w-4xl mx-auto px-6 relative z-10">
-            <div class="glass-panel rounded-3xl overflow-hidden relative shadow-[0_0_50px_rgba(0,210,255,0.1)]">
-                
-                <div class="bg-[#00D2FF] text-[#0B0F19] font-bold text-center py-2 text-sm uppercase tracking-widest">
-                    Vagas Limitadas - Lote Beta
-                </div>
-
-                <!-- Barra de Progresso -->
-                <div class="px-8 md:px-12 pt-6 pb-2">
-                    <div class="flex justify-between items-end mb-2">
-                        <span class="text-xs font-bold text-[#00D2FF] uppercase flex items-center gap-1">
-                            <i class="ph-fill ph-fire text-orange-500 animate-pulse"></i> Alta Procura
-                        </span>
-                        <span class="text-xs font-bold text-white">30% das vagas preenchidas</span>
-                    </div>
-                    <div class="w-full bg-black/50 rounded-full h-2 overflow-hidden border border-white/10">
-                        <div class="bg-gradient-to-r from-[#3A86FF] to-[#00D2FF] h-full rounded-full relative w-[30%]">
-                            <div class="absolute inset-0 bg-white/30 animate-shimmer"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-8 md:p-12 grid md:grid-cols-2 gap-8 items-center pt-6">
-                    <div class="space-y-4">
-                        <div>
-                            <p class="text-gray-400 text-sm line-through">De R$ 197,00</p>
-                            <div class="flex items-end gap-1">
-                                <span class="text-6xl font-display font-bold text-white">97</span>
-                                <div class="flex flex-col mb-2">
-                                    <span class="text-xl font-bold text-gray-300">,00</span>
-                                    <span class="text-[10px] text-gray-500 uppercase">Pagamento Único</span>
-                                </div>
-                            </div>
-                        </div>
-                        <ul class="space-y-3 text-sm text-gray-300">
-                            <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-[#00D2FF]"></i> Acesso Vitalício ao Agente</li>
-                            <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-[#00D2FF]"></i> Modificadores de Realismo</li>
-                            <li class="flex items-center gap-2"><i class="ph-fill ph-star text-purple-400"></i> Status de Membro Founder</li>
-                            <!-- Item de Desconto Futuro Adicionado -->
-                            <li class="flex items-center gap-2 bg-white/5 p-2 rounded border border-white/10 mt-2">
-                                <i class="ph-fill ph-tag text-[#00E096]"></i> 
-                                <span class="font-bold text-white">Desconto de 50% na plataforma futura</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="flex flex-col gap-3">
-                        <a href="https://pay.kiwify.com.br/R0Eonde" class="group relative w-full py-4 bg-[#00D2FF] text-[#0B0F19] font-bold text-lg rounded-xl shadow-lg shadow-[#00D2FF]/20 text-center hover:scale-[1.02] transition-transform overflow-hidden">
-                            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-                            QUERO MEU ACESSO
+                    <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+                        <a href="#offer" class="w-full sm:w-auto px-8 py-4 bg-[#00D2FF] text-[#0B0F19] font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_30px_rgba(0,210,255,0.3)] flex items-center justify-center gap-2 active:scale-95">
+                            <i class="ph-bold ph-lightning"></i>
+                            Acesso Founder (R$ 97)
                         </a>
-                        <p class="text-xs text-center text-gray-500 bg-white/5 p-2 rounded">
-                            ⚠️ Requer conta <strong>Gmail</strong>.
-                        </p>
+                        <a href="#metodologia" class="w-full sm:w-auto px-8 py-4 glass-panel text-white font-medium rounded-xl hover:bg-white/5 transition-all flex items-center justify-center gap-2 active:scale-95">
+                            <i class="ph-bold ph-book-open-text"></i>
+                            Ver Metodologia
+                        </a>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 pt-4 text-gray-500 text-sm font-medium">
+                        <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-[#00E096]"></i> Casos Infinitos</span>
+                        <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-[#00E096]"></i> Feedback Real</span>
+                    </div>
+                </div>
+
+                <div id="simulacao" class="relative animate-float lg:block hidden">
+                    <div class="glass-panel rounded-2xl border border-white/10 p-1 shadow-2xl max-w-md mx-auto transform transition-transform hover:scale-[1.01] duration-500">
+                        <div class="bg-[#0B0F19]/80 px-4 py-3 rounded-t-xl flex items-center gap-2 border-b border-white/5">
+                            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                            <div class="ml-4 text-xs text-gray-500 font-mono">Gemini Advanced • OSCE AI</div>
+                        </div>
+
+                        <div class="p-6 space-y-5 font-sans text-sm bg-[#0B0F19] h-[500px] overflow-hidden relative">
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded bg-[#3A86FF] flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
+                                <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200 w-full">
+                                    <p class="font-bold text-[#00D2FF] mb-1">INÍCIO DO CASO</p>
+                                    <ul class="space-y-1 text-xs text-gray-300">
+                                        <li><strong>Local:</strong> UPA 24h</li>
+                                        <li><strong>ID:</strong> Homem, 58 anos.</li>
+                                        <li><strong>Triagem:</strong> <span class="text-[#FFCF52]">Amarela</span> (PA 160x100)</li>
+                                        <li><strong>QP:</strong> "Doutor, tá queimando tudo aqui..."</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 justify-end">
+                                <div class="bg-[#00D2FF]/20 border border-[#00D2FF]/30 p-3 rounded-l-lg rounded-br-lg text-white max-w-[85%]">
+                                    Vou levar para sala de emergência e monitorizar. Caracterize a dor.
+                                </div>
+                                <div class="w-8 h-8 rounded bg-gray-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-gray-300">EU</div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded bg-[#3A86FF] flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
+                                <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200 w-full">
+                                    <p class="italic text-gray-400 mb-2">"A dor é um peso, nota 9/10... Irradia pro braço esquerdo."</p>
+                                    <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/10">
+                                        <span class="text-[10px] bg-[#FF4D4D]/20 text-[#FF4D4D] px-1 rounded border border-[#FF4D4D]/30">CRÍTICO</span>
+                                        <span class="text-[10px] text-gray-400">Modificador: Paciente ansioso</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#0B0F19] to-transparent pointer-events-none"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="mt-8 text-center text-gray-500 text-sm">
-                Garantia incondicional de 7 dias. &copy; 2025 OSCE AI.
-            </div>
-        </div>
-    </section>
+        </section>
 
-</body>
+        <section id="metodologia" class="py-20 bg-[#151B2B] border-y border-white/5 relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-display font-bold text-white mb-4">Não é um Chatbot. É uma Engine.</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">O prompt foi estruturado com base em protocolos educacionais reais.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl hover:border-[#00D2FF]/30 transition-all group">
+                        <i class="ph-duotone ph-sliders-horizontal text-4xl text-[#00D2FF] mb-4 group-hover:scale-110 transition-transform block"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Modificadores de Realismo</h3>
+                        <p class="text-gray-400 text-sm">Variáveis caóticas: pacientes com baixo letramento, familiares agressivos ou evolução temporal.</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl hover:border-[#3A86FF]/30 transition-all group">
+                        <i class="ph-duotone ph-books text-4xl text-[#3A86FF] mb-4 group-hover:scale-110 transition-transform block"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Pérola do Preceptor</h3>
+                        <p class="text-gray-400 text-sm">Lições práticas baseadas em evidência explicando o <em>porquê</em> de cada conduta.</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl hover:border-[#00E096]/30 transition-all group">
+                        <i class="ph-duotone ph-chart-line-up text-4xl text-[#00E096] mb-4 group-hover:scale-110 transition-transform block"></i>
+                        <h3 class="text-lg font-bold text-white mb-2">Feedback por Domínios</h3>
+                        <p class="text-gray-400 text-sm">Nota de Anamnese separada da nota de Conduta. Saiba onde melhorar.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="futuro" class="py-24 relative overflow-hidden z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="glass-panel rounded-3xl p-8 md:p-16 border border-[#00D2FF]/20 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00D2FF] to-transparent"></div>
+
+                    <div class="flex flex-col lg:flex-row gap-12 items-center relative z-10">
+                        <div class="lg:w-1/2 space-y-6">
+                            <div class="inline-block px-3 py-1 rounded bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider">
+                                Financie o Futuro
+                            </div>
+                            <h2 class="text-3xl md:text-5xl font-display font-bold text-white">
+                                A plataforma completa <br>está chegando.
+                            </h2>
+                            <p class="text-gray-300 text-lg">
+                                Estamos migrando do Gemini para uma <strong>plataforma web própria e dedicada</strong>, com histórico de desempenho e cenários complexos de UTI.
+                            </p>
+                            <p class="text-gray-400">
+                                Ao comprar o acesso ao <strong>Agente Textual</strong> hoje, você financia esse desenvolvimento e garante seu lugar como <strong>Membro Founder</strong>.
+                            </p>
+                        </div>
+
+                        <div class="lg:w-1/2 w-full">
+                             <div class="relative rounded-xl overflow-hidden border border-white/10 aspect-video bg-black group cursor-not-allowed">
+                                 <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"></div>
+                                 <div class="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm">
+                                    <i class="ph-duotone ph-lock-key text-5xl text-gray-400 mb-4 group-hover:text-white transition-colors"></i>
+                                    <span class="text-gray-300 font-mono text-sm tracking-widest uppercase group-hover:text-white transition-colors">Em Desenvolvimento</span>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="offer" class="py-24 relative z-10">
+            <div class="max-w-4xl mx-auto px-6 relative">
+                <div class="glass-panel rounded-3xl overflow-hidden relative shadow-[0_0_50px_rgba(0,210,255,0.1)]">
+                    
+                    <div class="bg-[#00D2FF] text-[#0B0F19] font-bold text-center py-2 text-sm uppercase tracking-widest">
+                        Vagas Limitadas - Lote Beta
+                    </div>
+
+                    <div class="px-8 md:px-12 pt-6 pb-2">
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="text-xs font-bold text-[#00D2FF] uppercase flex items-center gap-1">
+                                <i class="ph-fill ph-fire text-orange-500 animate-pulse"></i> Alta Procura
+                            </span>
+                            <span class="text-xs font-bold text-white">30% das vagas preenchidas</span>
+                        </div>
+                        <div class="w-full bg-black/50 rounded-full h-2 overflow-hidden border border-white/10">
+                            <div class="bg-gradient-to-r from-[#3A86FF] to-[#00D2FF] h-full rounded-full relative w-[30%]">
+                                <div class="absolute inset-0 bg-white/30 animate-shimmer"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-8 md:p-12 grid md:grid-cols-2 gap-8 items-center pt-6">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-gray-400 text-sm line-through">De R$ 197,00</p>
+                                <div class="flex items-end gap-1">
+                                    <span class="text-6xl font-display font-bold text-white">97</span>
+                                    <div class="flex flex-col mb-2">
+                                        <span class="text-xl font-bold text-gray-300">,00</span>
+                                        <span class="text-[10px] text-gray-500 uppercase">Pagamento Único</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <ul class="space-y-3 text-sm text-gray-300">
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-[#00D2FF]"></i> Acesso Vitalício ao Agente</li>
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-[#00D2FF]"></i> Modificadores de Realismo</li>
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-star text-purple-400"></i> Status de Membro Founder</li>
+                                <li class="flex items-center gap-2 bg-white/5 p-2 rounded border border-white/10 mt-2">
+                                    <i class="ph-fill ph-tag text-[#00E096]"></i> 
+                                    <span class="font-bold text-white">Desconto de 50% na plataforma futura</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <a href="https://pay.kiwify.com.br/R0Eonde" class="group relative w-full py-4 bg-[#00D2FF] text-[#0B0F19] font-bold text-lg rounded-xl shadow-lg shadow-[#00D2FF]/20 text-center hover:scale-[1.02] transition-transform overflow-hidden active:scale-95">
+                                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
+                                QUERO MEU ACESSO
+                            </a>
+                            <p class="text-xs text-center text-gray-500 bg-white/5 p-2 rounded">
+                                ⚠️ Requer conta <strong>Gmail</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center text-gray-500 text-sm">
+                    Garantia incondicional de 7 dias. &copy; 2025 OSCE AI.
+                </div>
+            </div>
+        </section>
+
+    </div> </body>
 </html>
