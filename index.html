@@ -2,91 +2,55 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <!-- Fix de escala para iPhone -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OSCE AI | Simulador Clínico Baseado em Evidências</title>
-    <meta name="description" content="Simulação médica avançada com modificadores de realismo e feedback baseado nas melhores evidências.">
+    <title>OSCE AI | Simulador Clínico</title>
+    <meta name="description" content="Simulação médica avançada com modificadores de realismo.">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS (SEM CONFIGURAÇÃO EXTERNA - BLINDADO) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Configuração do Design System (O segredo da beleza) -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            dark: '#0B0F19', 
-                            surface: '#151B2B', 
-                            accent: '#00D2FF', // Aquele Ciano Neon bonito
-                            secondary: '#3A86FF', // Azul Royal
-                            success: '#00E096', 
-                            warning: '#FFCF52', 
-                            danger: '#FF4D4D', 
-                        }
-                    },
-                    animation: {
-                        'float': 'float 8s ease-in-out infinite',
-                        'pulse-glow': 'pulse-glow 3s infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-15px)' },
-                        },
-                        'pulse-glow': {
-                            '0%, 100%': { boxShadow: '0 0 20px rgba(0, 210, 255, 0.2)' },
-                            '50%': { boxShadow: '0 0 40px rgba(0, 210, 255, 0.4)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        /* CSS RESET PARA SAFARI/IOS */
-        html, body {
-            -webkit-text-size-adjust: 100%;
-            background-color: #0B0F19; /* Evita clarão branco */
+        /* CSS CRÍTICO - Isso garante que o site tenha cor mesmo se o JS falhar */
+        body {
+            background-color: #0B0F19;
             color: #E2E8F0;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* CORREÇÃO DO VIDRO PARA IPHONE (O Pulo do Gato) */
+        /* Títulos com fonte especial */
+        h1, h2, h3, .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        /* Vidro fosco forçado para iOS */
         .glass-panel {
-            background: rgba(21, 27, 43, 0.7);
-            /* O Safari precisa destas duas linhas: */
-            -webkit-backdrop-filter: blur(16px);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(21, 27, 43, 0.75);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Correção de Gradiente em Texto no Safari */
+        /* Gradiente de Texto */
         .gradient-text {
             background: linear-gradient(135deg, #00D2FF 0%, #3A86FF 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Fallback */
-            color: #00D2FF; 
+            color: #00D2FF;
         }
 
+        /* Grid de Fundo */
         .hero-grid {
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -96,30 +60,35 @@
             -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
         }
 
-        /* Animação Typing */
-        .typing-dot {
-            animation: typing 1.4s infinite ease-in-out both;
+        /* Animações manuais para não depender do Tailwind Config */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
         }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+            animation: shimmer 2s infinite;
         }
     </style>
 </head>
-<body class="antialiased overflow-x-hidden selection:bg-brand-accent selection:text-brand-dark">
+<body class="antialiased overflow-x-hidden bg-[#0B0F19] text-slate-200 selection:bg-[#00D2FF] selection:text-[#0B0F19]">
 
-    <!-- Navbar Flutuante -->
-    <nav class="fixed w-full z-50 transition-all duration-300" :class="{ 'glass-panel py-3': scrolled, 'py-6 bg-transparent': !scrolled }" x-data="{ scrolled: false, mobileOpen: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 transition-all duration-300 py-4" :class="{ 'glass-panel': scrolled, 'bg-transparent': !scrolled }" x-data="{ scrolled: false, mobileOpen: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <!-- Logo -->
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-accent to-brand-secondary flex items-center justify-center">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00D2FF] to-[#3A86FF] flex items-center justify-center">
                     <i class="ph-bold ph-brain text-white text-lg"></i>
                 </div>
-                <span class="font-display font-bold text-xl tracking-tight text-white">OSCE <span class="text-brand-accent">AI</span></span>
+                <span class="font-display font-bold text-xl tracking-tight text-white">OSCE <span class="text-[#00D2FF]">AI</span></span>
             </div>
 
             <!-- Desktop Links -->
@@ -129,48 +98,49 @@
                 <a href="#futuro" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Roadmap</a>
             </div>
 
-            <!-- CTA Button -->
+            <!-- CTA Button Desktop -->
             <div class="hidden md:block">
-                <a href="#offer" class="px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-brand-accent/50 text-white text-sm font-medium transition-all flex items-center gap-2 group">
+                <a href="#offer" class="px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[#00D2FF]/50 text-white text-sm font-medium transition-all flex items-center gap-2 group">
                     <span>Acesso Beta</span>
-                    <i class="ph-bold ph-arrow-right group-hover:translate-x-1 transition-transform text-brand-accent"></i>
+                    <i class="ph-bold ph-arrow-right text-[#00D2FF] group-hover:translate-x-1 transition-transform"></i>
                 </a>
             </div>
 
             <!-- Mobile Toggle -->
-            <button class="md:hidden text-white" @click="mobileOpen = !mobileOpen">
+            <button class="md:hidden text-white p-2" @click="mobileOpen = !mobileOpen">
                 <i class="ph-bold ph-list text-2xl"></i>
             </button>
         </div>
 
         <!-- Mobile Menu -->
-        <div class="md:hidden glass-panel border-t border-white/5 absolute w-full" x-show="mobileOpen" x-transition x-cloak>
-            <div class="flex flex-col p-4 space-y-4">
-                <a href="#metodologia" @click="mobileOpen=false" class="text-gray-300">Metodologia</a>
-                <a href="#simulacao" @click="mobileOpen=false" class="text-gray-300">Preview</a>
-                <a href="#offer" @click="mobileOpen=false" class="text-brand-accent font-bold">Quero Acesso</a>
+        <div class="md:hidden glass-panel border-t border-white/5 absolute top-full left-0 w-full" x-show="mobileOpen" x-transition style="display: none;">
+            <div class="flex flex-col p-6 space-y-6">
+                <a href="#metodologia" @click="mobileOpen=false" class="text-gray-300 text-lg font-medium">Metodologia</a>
+                <a href="#simulacao" @click="mobileOpen=false" class="text-gray-300 text-lg font-medium">Preview</a>
+                <a href="#offer" @click="mobileOpen=false" class="text-[#00D2FF] font-bold text-lg border border-[#00D2FF]/30 bg-[#00D2FF]/10 p-3 rounded-lg text-center">Quero Acesso Agora</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden">
-        <!-- Background Grid -->
-        <div class="absolute inset-0 hero-grid z-0"></div>
-        <!-- Glow Spotlights (Restaurados) -->
-        <div class="absolute top-1/4 -left-20 w-96 h-96 bg-brand-secondary/20 rounded-full blur-[128px]"></div>
-        <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-brand-accent/10 rounded-full blur-[128px]"></div>
+    <section class="relative min-h-screen flex items-center justify-center pt-28 pb-12 overflow-hidden">
+        <!-- Glows Manuais (Hardcoded para performance) -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div class="absolute top-[20%] -left-[10%] w-[500px] h-[500px] bg-[#3A86FF] rounded-full blur-[120px] opacity-20"></div>
+            <div class="absolute bottom-[20%] -right-[10%] w-[500px] h-[500px] bg-[#00D2FF] rounded-full blur-[120px] opacity-10"></div>
+            <div class="absolute inset-0 hero-grid z-0 opacity-30"></div>
+        </div>
 
         <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
             
-            <!-- Hero Copy -->
+            <!-- Texto -->
             <div class="space-y-8 text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/10 border border-brand-accent/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse"></span>
-                    <span class="text-xs font-semibold tracking-wide text-brand-accent uppercase">Engine v1.0 Disponível</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D2FF]/10 border border-[#00D2FF]/20">
+                    <span class="w-2 h-2 rounded-full bg-[#00D2FF] animate-pulse"></span>
+                    <span class="text-xs font-semibold tracking-wide text-[#00D2FF] uppercase">Engine v1.0 Disponível</span>
                 </div>
 
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight tracking-tight">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight tracking-tight text-white">
                     O Preceptor que <br>
                     <span class="gradient-text">nunca dorme.</span>
                 </h1>
@@ -180,7 +150,7 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-                    <a href="#offer" class="w-full sm:w-auto px-8 py-4 bg-brand-accent text-brand-dark font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_30px_rgba(0,210,255,0.3)] flex items-center justify-center gap-2">
+                    <a href="#offer" class="w-full sm:w-auto px-8 py-4 bg-[#00D2FF] text-[#0B0F19] font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_30px_rgba(0,210,255,0.3)] flex items-center justify-center gap-2">
                         <i class="ph-bold ph-lightning"></i>
                         Acesso Founder (R$ 97)
                     </a>
@@ -191,122 +161,99 @@
                 </div>
                 
                 <div class="flex items-center justify-center lg:justify-start gap-6 pt-4 text-gray-500 text-sm font-medium">
-                    <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-brand-success"></i> Casos Infinitos</span>
-                    <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-brand-success"></i> Feedback Real</span>
+                    <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-[#00E096]"></i> Casos Infinitos</span>
+                    <span class="flex items-center gap-1"><i class="ph-fill ph-check-circle text-[#00E096]"></i> Feedback Real</span>
                 </div>
             </div>
 
-            <!-- Visual Demo (The Chat Interface) -->
+            <!-- Demo Visual -->
             <div id="simulacao" class="relative animate-float lg:block hidden">
                 <div class="glass-panel rounded-2xl border border-white/10 p-1 shadow-2xl max-w-md mx-auto">
-                    <!-- Fake Browser Bar -->
-                    <div class="bg-brand-dark/50 px-4 py-3 rounded-t-xl flex items-center gap-2 border-b border-white/5">
+                    <div class="bg-[#0B0F19]/80 px-4 py-3 rounded-t-xl flex items-center gap-2 border-b border-white/5">
                         <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
                         <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
                         <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-                        <div class="ml-4 text-xs text-gray-500 font-mono">Gemini Advanced • OSCE AI Gem</div>
+                        <div class="ml-4 text-xs text-gray-500 font-mono">Gemini Advanced • OSCE AI</div>
                     </div>
 
-                    <!-- Chat Content -->
-                    <div class="p-6 space-y-5 font-sans text-sm bg-brand-dark/80 h-[500px] overflow-hidden relative">
-                        <!-- AI Msg 1: Case Start -->
+                    <div class="p-6 space-y-5 font-sans text-sm bg-[#0B0F19] h-[500px] overflow-hidden relative">
+                        <!-- AI Msg -->
                         <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-brand-secondary flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
-                            <div class="space-y-2">
-                                <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200">
-                                    <p class="font-bold text-brand-accent mb-1">INÍCIO DO CASO</p>
-                                    <ul class="space-y-1 text-xs text-gray-300">
-                                        <li><strong>Local:</strong> UPA 24h</li>
-                                        <li><strong>ID:</strong> Homem, 58 anos.</li>
-                                        <li><strong>Ectoscopia:</strong> Entra amparado, sudorético, mão no peito.</li>
-                                        <li><strong>Triagem:</strong> <span class="text-brand-warning">Amarela</span> (PA 160x100, FC 110)</li>
-                                        <li><strong>QP:</strong> "Doutor, tá queimando tudo aqui..."</li>
-                                    </ul>
-                                </div>
+                            <div class="w-8 h-8 rounded bg-[#3A86FF] flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
+                            <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200 w-full">
+                                <p class="font-bold text-[#00D2FF] mb-1">INÍCIO DO CASO</p>
+                                <ul class="space-y-1 text-xs text-gray-300">
+                                    <li><strong>Local:</strong> UPA 24h</li>
+                                    <li><strong>ID:</strong> Homem, 58 anos.</li>
+                                    <li><strong>Triagem:</strong> <span class="text-[#FFCF52]">Amarela</span> (PA 160x100)</li>
+                                    <li><strong>QP:</strong> "Doutor, tá queimando tudo aqui..."</li>
+                                </ul>
                             </div>
                         </div>
 
                         <!-- User Msg -->
                         <div class="flex gap-3 justify-end">
-                            <div class="bg-brand-accent/20 border border-brand-accent/30 p-3 rounded-l-lg rounded-br-lg text-white max-w-[85%]">
-                                Vou levar para sala de emergência, monitorizar, oxigênio se sat < 90% e acesso venoso. Caracterize a dor (SOCRATES).
+                            <div class="bg-[#00D2FF]/20 border border-[#00D2FF]/30 p-3 rounded-l-lg rounded-br-lg text-white max-w-[85%]">
+                                Vou levar para sala de emergência e monitorizar. Caracterize a dor.
                             </div>
                             <div class="w-8 h-8 rounded bg-gray-600 flex-shrink-0 flex items-center justify-center text-xs">EU</div>
                         </div>
 
-                        <!-- AI Msg 2: Response with realism -->
+                        <!-- AI Msg 2 -->
                         <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-brand-secondary flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
-                            <div class="space-y-2">
-                                <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200">
-                                    <p class="italic text-gray-400 mb-2">"A dor é um peso, nota 9/10... Irradia pro braço esquerdo."</p>
-                                    <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/10">
-                                        <span class="text-[10px] bg-brand-danger/20 text-brand-danger px-1 rounded border border-brand-danger/30">CRÍTICO</span>
-                                        <span class="text-[10px] text-gray-400">Modificador de Realismo: Paciente ansioso</span>
-                                    </div>
+                            <div class="w-8 h-8 rounded bg-[#3A86FF] flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-robot text-white"></i></div>
+                            <div class="bg-white/5 p-3 rounded-r-lg rounded-bl-lg border border-white/10 text-gray-200 w-full">
+                                <p class="italic text-gray-400 mb-2">"A dor é um peso, nota 9/10... Irradia pro braço esquerdo."</p>
+                                <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/10">
+                                    <span class="text-[10px] bg-[#FF4D4D]/20 text-[#FF4D4D] px-1 rounded border border-[#FF4D4D]/30">CRÍTICO</span>
+                                    <span class="text-[10px] text-gray-400">Modificador: Paciente ansioso</span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Gradient fade at bottom -->
-                        <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-brand-dark to-transparent"></div>
+
+                        <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#0B0F19] to-transparent"></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Methodology Section (The Prompt Logic) -->
-    <section id="metodologia" class="py-24 bg-brand-surface border-y border-white/5">
+    <!-- Metodologia -->
+    <section id="metodologia" class="py-20 bg-[#151B2B] border-y border-white/5">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">Não é um Chatbot. É uma Engine.</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">O prompt foi estruturado com base em protocolos educacionais reais. Você não está conversando aleatoriamente; está sendo avaliado.</p>
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-display font-bold text-white mb-4">Não é um Chatbot. É uma Engine.</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">O prompt foi estruturado com base em protocolos educacionais reais.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-3 gap-6">
                 <!-- Card 1 -->
-                <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group hover:border-brand-accent/30 transition-all">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="ph-duotone ph-sliders-horizontal text-8xl text-brand-accent"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Modificadores de Realismo</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        No "Modo Simulação Total", a IA introduz variáveis caóticas: pacientes com baixo letramento, familiares agressivos, ou evolução temporal ("Paciente piorou após 30 min").
-                    </p>
+                <div class="glass-panel p-6 rounded-2xl hover:border-[#00D2FF]/30 transition-all">
+                    <i class="ph-duotone ph-sliders-horizontal text-4xl text-[#00D2FF] mb-4"></i>
+                    <h3 class="text-lg font-bold text-white mb-2">Modificadores de Realismo</h3>
+                    <p class="text-gray-400 text-sm">Variáveis caóticas: pacientes com baixo letramento, familiares agressivos ou evolução temporal.</p>
                 </div>
-
                 <!-- Card 2 -->
-                <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group hover:border-brand-secondary/30 transition-all">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="ph-duotone ph-books text-8xl text-brand-secondary"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Pérola do Preceptor</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Ao final, você não recebe apenas o gabarito. Recebe a "Pérola": uma lição prática baseada em evidência explicando o <em>porquê</em> da conduta.
-                    </p>
+                <div class="glass-panel p-6 rounded-2xl hover:border-[#3A86FF]/30 transition-all">
+                    <i class="ph-duotone ph-books text-4xl text-[#3A86FF] mb-4"></i>
+                    <h3 class="text-lg font-bold text-white mb-2">Pérola do Preceptor</h3>
+                    <p class="text-gray-400 text-sm">Lições práticas baseadas em evidência explicando o <em>porquê</em> de cada conduta.</p>
                 </div>
-
                 <!-- Card 3 -->
-                <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group hover:border-brand-success/30 transition-all">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="ph-duotone ph-chart-line-up text-8xl text-brand-success"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Avaliação por Domínios</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Feedback segmentado: sua nota de Anamnese é separada da nota de Conduta. Saiba exatamente onde você precisa estudar mais.
-                    </p>
+                <div class="glass-panel p-6 rounded-2xl hover:border-[#00E096]/30 transition-all">
+                    <i class="ph-duotone ph-chart-line-up text-4xl text-[#00E096] mb-4"></i>
+                    <h3 class="text-lg font-bold text-white mb-2">Feedback por Domínios</h3>
+                    <p class="text-gray-400 text-sm">Nota de Anamnese separada da nota de Conduta. Saiba onde melhorar.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- The Roadmap/Future Section -->
+    <!-- Roadmap / Futuro -->
     <section id="futuro" class="py-24 relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="glass-panel rounded-3xl p-8 md:p-16 border border-brand-accent/20 relative">
-                <!-- Decorator -->
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-accent to-transparent"></div>
+            <div class="glass-panel rounded-3xl p-8 md:p-16 border border-[#00D2FF]/20 relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00D2FF] to-transparent"></div>
 
                 <div class="flex flex-col lg:flex-row gap-12 items-center">
                     <div class="lg:w-1/2 space-y-6">
@@ -317,7 +264,7 @@
                             A plataforma completa <br>está chegando.
                         </h2>
                         <p class="text-gray-300 text-lg">
-                            Estamos migrando do Gemini para uma <strong>plataforma web própria e dedicada</strong>, com histórico de desempenho e cenários complexos de UTI. Isso custa caro e leva tempo.
+                            Estamos migrando do Gemini para uma <strong>plataforma web própria e dedicada</strong>, com histórico de desempenho e cenários complexos de UTI.
                         </p>
                         <p class="text-gray-400">
                             Ao comprar o acesso ao <strong>Agente Textual</strong> hoje, você financia esse desenvolvimento e garante seu lugar como <strong>Membro Founder</strong>.
@@ -325,9 +272,7 @@
                     </div>
 
                     <div class="lg:w-1/2 w-full">
-                         <!-- Visual representation of the locked future platform -->
-                        <div class="relative rounded-xl overflow-hidden border border-white/10 aspect-video bg-black group cursor-not-allowed">
-                             <!-- Placeholder futurista -->
+                         <div class="relative rounded-xl overflow-hidden border border-white/10 aspect-video bg-black group cursor-not-allowed">
                              <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-700"></div>
                              <div class="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm">
                                 <i class="ph-duotone ph-lock-key text-5xl text-gray-400 mb-4"></i>
@@ -340,40 +285,32 @@
         </div>
     </section>
 
-    <!-- Offer / Pricing Section -->
+    <!-- Oferta -->
     <section id="offer" class="py-24 relative">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none"></div>
-
         <div class="max-w-4xl mx-auto px-6 relative z-10">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-5xl font-display font-bold mb-4 text-white">Oferta Founder's Access</h2>
-                <p class="text-gray-400 text-lg">Menos que o preço de um livro de semiologia.</p>
-            </div>
-
-            <div class="glass-panel border-2 border-brand-accent/50 rounded-3xl overflow-hidden relative shadow-[0_0_50px_rgba(0,210,255,0.15)]">
+            <div class="glass-panel rounded-3xl overflow-hidden relative shadow-[0_0_50px_rgba(0,210,255,0.1)]">
                 
-                <!-- Ribbon -->
-                <div class="bg-brand-accent text-brand-dark font-bold text-center py-2 text-sm tracking-widest uppercase">
+                <div class="bg-[#00D2FF] text-[#0B0F19] font-bold text-center py-2 text-sm uppercase tracking-widest">
                     Vagas Limitadas - Lote Beta
                 </div>
 
-                <!-- BARRA DE ESCASSEZ -->
+                <!-- Barra de Progresso -->
                 <div class="px-8 md:px-12 pt-6 pb-2">
                     <div class="flex justify-between items-end mb-2">
-                        <span class="text-xs font-bold text-brand-accent uppercase tracking-wider flex items-center gap-1">
+                        <span class="text-xs font-bold text-[#00D2FF] uppercase flex items-center gap-1">
                             <i class="ph-fill ph-fire text-orange-500 animate-pulse"></i> Alta Procura
                         </span>
                         <span class="text-xs font-bold text-white">30% das vagas preenchidas</span>
                     </div>
-                    <div class="w-full bg-brand-dark/50 rounded-full h-2.5 border border-white/10 overflow-hidden">
-                        <div class="bg-gradient-to-r from-brand-secondary to-brand-accent h-full rounded-full relative transition-all duration-1000 ease-out" style="width: 30%">
-                            <div class="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite]"></div>
+                    <div class="w-full bg-black/50 rounded-full h-2 overflow-hidden border border-white/10">
+                        <div class="bg-gradient-to-r from-[#3A86FF] to-[#00D2FF] h-full rounded-full relative w-[30%]">
+                            <div class="absolute inset-0 bg-white/30 animate-shimmer"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-8 md:p-12 grid md:grid-cols-2 gap-10 items-center pt-6">
-                    <div class="space-y-6">
+                <div class="p-8 md:p-12 grid md:grid-cols-2 gap-8 items-center pt-6">
+                    <div class="space-y-4">
                         <div>
                             <p class="text-gray-400 text-sm line-through">De R$ 197,00</p>
                             <div class="flex items-end gap-1">
@@ -384,61 +321,35 @@
                                 </div>
                             </div>
                         </div>
-
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3 text-gray-300">
-                                <i class="ph-fill ph-check-circle text-brand-accent text-xl"></i>
-                                <span>Acesso vitalício ao <strong>Agente OSCE AI</strong></span>
-                            </li>
-                            <li class="flex items-start gap-3 text-gray-300">
-                                <i class="ph-fill ph-check-circle text-brand-accent text-xl"></i>
-                                <span>Modo Simulação Total + Modificadores</span>
-                            </li>
-                            <li class="flex items-start gap-3 text-white font-medium bg-white/5 p-2 rounded-lg border border-white/10">
-                                <i class="ph-fill ph-star text-purple-400 text-xl"></i>
-                                <span>Desconto de 50% na plataforma futura</span>
+                        <ul class="space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-[#00D2FF]"></i> Acesso Vitalício ao Agente</li>
+                            <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-[#00D2FF]"></i> Modificadores de Realismo</li>
+                            <li class="flex items-center gap-2"><i class="ph-fill ph-star text-purple-400"></i> Status de Membro Founder</li>
+                            <!-- Item de Desconto Futuro Adicionado -->
+                            <li class="flex items-center gap-2 bg-white/5 p-2 rounded border border-white/10 mt-2">
+                                <i class="ph-fill ph-tag text-[#00E096]"></i> 
+                                <span class="font-bold text-white">Desconto de 50% na plataforma futura</span>
                             </li>
                         </ul>
                     </div>
 
-                    <div class="flex flex-col gap-4">
-                        <!-- Botão de Compra -->
-                        <a href="https://pay.kiwify.com.br/R0Eonde" class="group relative w-full py-5 bg-brand-accent text-brand-dark font-bold text-lg rounded-xl shadow-lg shadow-brand-accent/20 overflow-hidden text-center hover:scale-[1.02] transition-transform">
-                            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                    <div class="flex flex-col gap-3">
+                        <a href="https://pay.kiwify.com.br/R0Eonde" class="group relative w-full py-4 bg-[#00D2FF] text-[#0B0F19] font-bold text-lg rounded-xl shadow-lg shadow-[#00D2FF]/20 text-center hover:scale-[1.02] transition-transform overflow-hidden">
+                            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
                             QUERO MEU ACESSO
                         </a>
-                        
-                        <div class="text-center space-y-2">
-                            <p class="text-xs text-gray-500 flex items-center justify-center gap-1">
-                                <i class="ph-fill ph-lock-key"></i> Compra segura via Kiwify
-                            </p>
-                            <p class="text-xs text-brand-warning bg-brand-warning/10 border border-brand-warning/20 p-2 rounded">
-                                <strong>Importante:</strong> Requer conta Google (Gmail) para acessar a IA.
-                            </p>
-                        </div>
+                        <p class="text-xs text-center text-gray-500 bg-white/5 p-2 rounded">
+                            ⚠️ Requer conta <strong>Gmail</strong>.
+                        </p>
                     </div>
                 </div>
             </div>
             
-            <div class="mt-8 text-center">
-                <p class="text-sm text-gray-500">Garantia incondicional de 7 dias. Não gostou? Devolvemos seu dinheiro.</p>
+            <div class="mt-8 text-center text-gray-500 text-sm">
+                Garantia incondicional de 7 dias. &copy; 2025 OSCE AI.
             </div>
         </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="border-t border-white/5 py-12 bg-brand-dark">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-2 opacity-50">
-                <i class="ph-fill ph-brain text-xl text-white"></i>
-                <span class="font-bold text-white">OSCE AI</span>
-            </div>
-            <p class="text-gray-600 text-xs text-center md:text-right max-w-md">
-                Este é um simulador educacional. Nenhuma informação aqui substitui o julgamento clínico profissional ou protocolos institucionais. <br>
-                &copy; 2025 OSCE AI. Todos os direitos reservados.
-            </p>
-        </div>
-    </footer>
 
 </body>
 </html>
